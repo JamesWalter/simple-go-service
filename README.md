@@ -17,11 +17,11 @@ RUN go install -v /github.com/JamesWalter/simple-go-service
 CMD [ "simple-go-service" ]
 ```
 
-To build the docker image
+To build the docker image (using "test-go" as the image name here , replace it with whatever you would like)
 ```
-$ docker build -t test-go.
+$ docker build -t test-go
 ```
-Then to run 
+Then to run (my-test-go is the container name, replace it with whatever you would like)
 Using auto port mapping
 ```
 $ docker run -it --rm --name my-test-go test-go -P 
