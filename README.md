@@ -22,5 +22,5 @@ $ docker build --tag simple-go-service .
 ```
 Then to run the go serivice will be listening on 8080, here 8080 is being mapped to 8888 on the docker host
 ```
-$ docker run --detach --publish 8080:8888 --rm --name my-go_service simple-go-service 
+$ docker run --detach --publish 8888:8080 --rm --name my-go_service simple-go-service 
 ```
