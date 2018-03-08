@@ -24,7 +24,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	born = time.Now()
+	born = time.Now().Local()
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

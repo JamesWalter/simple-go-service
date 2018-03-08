@@ -2,7 +2,7 @@
 
 This simple service was created to aid in setting up docker deployments
 
-To start a docker container to host the service create a Dockerfile:
+To start build an image and docker container to host the service create a Dockerfile:
 
 ```
 FROM golang:1.8
@@ -12,21 +12,15 @@ EXPOSE 8080
 WORKDIR /go/src/app/
 COPY . .
 
-RUN go get -d -v /github.com/JamesWalter/simple-go-service
-RUN go install -v /github.com/JamesWalter/simple-go-service
+RUN go get -d -v github.com/JamesWalter/simple-go-service
+RUN go install -v github.com/JamesWalter/simple-go-service
 CMD [ "simple-go-service" ]
 ```
-
-To build the docker image (using "test-go" as the image name here , replace it with whatever you would like)
+Then build the image by executing this command in the same directory as the DockerFile
 ```
-$ docker build -t test-go .
+$ docker build --tag simple-go-service .
 ```
-Then to run (my-test-go is the container name, replace it with whatever you would like)
-Using auto port mapping
+Then to run the go serivice will be listening on 8080, here 8080 is being mapped to 8888 on the docker host
 ```
-$ docker run -it --rm --name my-test-go test-go -P 
-```
-Specify your own port mapping
-```
-$ docker run -it --rm --name my-test-go test-go -p 8080:8080
+$ docker run --detach --publish 8080:8888 --rm --name my-go_service simple-go-service 
 ```
