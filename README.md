@@ -34,8 +34,8 @@ Start by creating a new directory called `my-first-image`. Then create a new fil
 
 If you are using  play with docker you will be using the command line. The commands denoted with $ are command line commands
 ```
-$ mkdir "$HOME"\my-docker-build
-$ touch "$HOME"\my-docker-build\Dockerfile
+$ mkdir "$HOME"/my-first-image
+$ touch "$HOME"/my-first-image/Dockerfile
 ```
 
 ### Dockerfile
@@ -44,8 +44,8 @@ A `Dockerfile` is the cookbook for a docker image. It contains all of the comman
 
 Open the new `Dockerfile` in your favorite text editor (e.g. [vim](https://www.howtoforge.com/vim-basics)).
 ```
-$ cd "$HOME"\my-docker-build
-$ vim my-docker-build
+$ cd "$HOME"/my-first-image
+$ vim Dockerfile
 ```
 
 Here are the contents of the enire `Dockerfile`
@@ -121,7 +121,7 @@ I was born "Mon Mar 12 21:42:35 UTC 2018"
 ```
 
 # Running multiple containers
-Now run mulitple containers each running its own instance of the go web app. Do this by executing the 'docker run' command using different names and host port mapping for each container
+Now run mulitple containers each running its own instance of the Go web app. Do this by executing the `docker run` command using different names and host port mapping for each container
 
 ```
 $ docker run --detach --publish 8889:8080 --rm --name go-2 simple-go-service 
@@ -141,22 +141,38 @@ Try visiting each different host port, paying attention to the container id's.
 
 # Nginx
 
-Stepping complexity up a bit build a reverse proxy server using Nginx. The server should be the single point of access for the Go web app. Additionally the server should distribute accesses amongst multiple Go containers.
+Stepping complexity up a bit, its time build a [Nginx reverse proxy server](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/). The server will be the single point of access for the Go web app. Additionally the server will distribute accesses amongst multiple Go containers.
 
-Before building the refverse proxy server do some house keeping. Stop all running instances of the go web app. Use `docker ps` and `docker stop <container_id>`. For example 
+Before building the reverse proxy server do some house keeping. Stop all running instances of the go web app. Use `docker ps` and `docker stop <container_id>` or `docker stop <container_name>`. For example 
 ```
 $ docker stop go-1
 ```
 
-### Nginx Reverse Proxy config
-Create `nginx.conf` file
+Now create a new directory for the proxy server build, add a Dockerfile, and a file named `nginx.conf`.
 ```
-worker_processes 4;
+$ mkdir "$HOME"/nginx
+$ touch "$HOME"/nginx/Dockerfile
+$ touch "$HOME"/nginx/nginx.conf
 
-events { worker_connections 1024; }
+```
+
+### Nginx Reverse Proxy config
+The `nginx.conf` file will contain the configuration of the nginx server that will be deployed in the Docker container.
+
+Navigate to and open the nginx.conf file.
+
+```
+$ cd "$HOME"/nginx
+$ vim nginx.conf
+```
+
+Add the following configuration to the file
+```
+worker_processes 1;
+
+events{ worker_connections 1028; }
 
 http {
-    sendfile on;
 
     upstream app_servers {
         server go-1:8080;
@@ -168,7 +184,6 @@ http {
 	    listen 8888;
 	    location / {
             proxy_pass         http://app_servers;
-            proxy_redirect     off;
             proxy_set_header   Host $host;
             proxy_set_header   X-Real-IP $remote_addr;
             proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -179,28 +194,91 @@ http {
 
 ```
 
+The deatails surrounding the configuration won't be discussed here but a good starting point for learning more is the [Nginx Beginners Guide](http://nginx.org/en/docs/beginners_guide.html)
+
 ### Nginx Dockerfile
+The Dockerfile for the Nginx reverse proxy is simple, it extends the nginx image from [Docker Hub](https://hub.docker.com/_/nginx/)
+
+Open the Dockerfile that was created in the nginx directory.
+```
+$ cd "$HOME"/nginx
+$ vim Dockerfile
+```
+
+Enter the commands below and save
 ```
 FROM nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 ```
 
 ### Build Image
-
+Building the Nginx reverse proxy image is simple. From within the nginx directory execute the `docker build` command
+```
+$ cd "$HOME"/nginx
+$ docker build --tag nginx-reverse-proxy .
+```
 
 ### Set up network 
+Before starting up simple-go-service containers and a nginx-proxy container, set up a Docker networkm. This network will allow connections between containers without having to expose ports on the host machine.
 ```
 $ docker network create test-net
 ```
+
+### Run multiple Go contianers
+With the netork `test-net` setup. Run 3 simple-go-service containers, include the `--network test-net` option. Notice that `--publish' has been removed. The listening ports for each container are only available to other containers within Docker.
+
 ```
 $ docker run --detach --network test-net --name go-1 simple-go-service
-$ docker run --detach  --network test-net --name go-2 simple-go-service
-$ docker run --detach  --network test-net --name go-3 simple-go-service
+$ docker run --detach --network test-net --name go-2 simple-go-service
+$ docker run --detach --network test-net --name go-3 simple-go-service
 ```
 
-### Run Nginx
+### Run Nginx Reverse Proxy
+Run the nginx-reverse-proxy. Include `--network test-net` and also publish the listening port identified in the `nginx.conf` configuration file. Here port 8100 on the host machine is being mapped to port 8888 of the container. This will be the single point of entry to any of the simple-go-service containers.
+
 ```
-$ docker run --detach --rm --network test-net -p 8888:8888 --name proxy go-service-proxy
+$ docker run --detach --network test-net -p 8100:8888 --name proxy nginx-reverse-proxy
 ````
+
+## Test Nginx Reverse Proxy
+Check that all 4 containers are up and running.
+```
+$ docker ps
+CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                            NAMES
+b31459ffab02        nginx-reverse-proxy   "nginx -g 'daemon of"    2 minutes ago       Up About a minute   80/tcp, 0.0.0.0:8100->8888/tcp   proxy
+a124830c6bca        simple-go-service     "simple-go-service"      41 minutes ago      Up About a minute   8080/tcp                         go-3
+1958a5a8b10c        simple-go-service     "simple-go-service"      41 minutes ago      Up About a minute   8080/tcp                         go-2
+7fc356de9ad9        simple-go-service     "simple-go-service"      42 minutes ago      Up About a minute   8080/tcp                         go-1
+```
+
+Now try and connect to the proxy. `curl` is shown below but browser can be used instead. Calling `curl` or refreshing your browser should execute on different containers.
+
+```
+
+$ curl http://127.0.0.1:8100
+Hello from container "7fc356de9ad9"
+I have been visted 1 times
+I was born "Tue Mar 13 23:15:39 UTC 2018"
+
+$ curl http://127.0.0.1:8100
+Hello from container "1958a5a8b10c"
+I have been visted 1 times
+I was born "Tue Mar 13 23:15:43 UTC 2018"
+
+$ curl http://127.0.0.1:8100
+Hello from container "a124830c6bca"
+I have been visted 1 times
+I was born "Tue Mar 13 23:15:50 UTC 2018"
+
+```
+
+## Final comments
+Notice that the last 3 Go containers were started without `--rm`, as was the nginx one. This means that the containers are not removed after stopping. Instead of having to issue another `docker run` command, a `docker start <container name>` command can be use.
+
+Try starting and stopping the Go containers. 
+
+To delete a continer issue `docker rm <container name>`
+
+
 
 
