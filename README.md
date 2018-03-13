@@ -76,7 +76,7 @@ See [Dockerfile Reference](https://docs.docker.com/engine/reference/builder/) fo
 ### Build Command
 To build a Docker container image the `Dockerfile` will be executed by issuing a `$ docker build` command.
 
-The command below is the simlest the build can get, this command must be executed from the directory of the `Dockerfile`
+The command below is the simple. This command must be executed from the directory of the `Dockerfile`
 ```
 $ docker build --tag simple-go-service .
 ```
@@ -197,7 +197,7 @@ http {
 The deatails surrounding the configuration won't be discussed here but a good starting point for learning more is the [Nginx Beginners Guide](http://nginx.org/en/docs/beginners_guide.html)
 
 ### Nginx Dockerfile
-The Dockerfile for the Nginx reverse proxy is simple, it extends the nginx image from [Docker Hub](https://hub.docker.com/_/nginx/) and copies the configuaration file that was created into the image.
+The Dockerfile for the Nginx reverse proxy is simple, it extends the nginx image from [Docker Hub](https://hub.docker.com/_/nginx/) and copies the configuration file that was created into the image.
 
 Open the Dockerfile that was created in the nginx directory.
 ```
