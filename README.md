@@ -4,7 +4,7 @@ This repository was created to help learn about [Docker](https://www.docker.com/
 
 The tutorial below can be run in a free in bowser Alpine Linux Virtual Machine. [Play With Docker](https://labs.play-with-docker.com/)
 
-For mor information about docker:
+For more information about docker:
 + [Docker offical website](https://www.docker.com/) 
 + [Docker tutorials using play with docker](https://training.play-with-docker.com/)
 + [Docker Get Started](https://docs.docker.com/get-started/)
@@ -17,7 +17,7 @@ The tutorial below will cover
 
 # Go Web App 
 
-The go app itself is a simple web app that will return the hostname (container id), the time the web app was started, and the number of visits. All via HTTP
+The Go app itself is a simple web app that will return the hostname (container id), the time the web app was started, and the number of visits.
 
 For example
 ```
@@ -197,7 +197,7 @@ http {
 The deatails surrounding the configuration won't be discussed here but a good starting point for learning more is the [Nginx Beginners Guide](http://nginx.org/en/docs/beginners_guide.html)
 
 ### Nginx Dockerfile
-The Dockerfile for the Nginx reverse proxy is simple, it extends the nginx image from [Docker Hub](https://hub.docker.com/_/nginx/)
+The Dockerfile for the Nginx reverse proxy is simple, it extends the nginx image from [Docker Hub](https://hub.docker.com/_/nginx/) and copies the configuaration file that was created into the image.
 
 Open the Dockerfile that was created in the nginx directory.
 ```
@@ -219,13 +219,13 @@ $ docker build --tag nginx-reverse-proxy .
 ```
 
 ### Set up network 
-Before starting up simple-go-service containers and a nginx-proxy container, set up a Docker networkm. This network will allow connections between containers without having to expose ports on the host machine.
+Before starting up simple-go-service containers and the nginx-proxy container, set up a Docker network. This network will allow connections between containers without having to expose ports on the host machine.
 ```
 $ docker network create test-net
 ```
 
 ### Run multiple Go contianers
-With the netork `test-net` setup. Run 3 simple-go-service containers, include the `--network test-net` option. Notice that `--publish' has been removed. The listening ports for each container are only available to other containers within Docker.
+With the network `test-net` setup. Run 3 simple-go-service containers, include the `--network test-net` option. Notice that `--publish' has been removed. The listening ports for each container are only available to other containers within Docker.
 
 ```
 $ docker run --detach --network test-net --name go-1 simple-go-service
@@ -276,7 +276,7 @@ Notice that the last 3 Go containers were started without `--rm`, as was the ngi
 
 Try starting and stopping the Go containers. 
 
-To delete a continer issue `docker rm <container name>`
+To delete a container issue `docker rm <container name>`
 
 # Kubernetes
  Coming soon
