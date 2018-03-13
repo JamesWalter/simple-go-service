@@ -272,12 +272,14 @@ I was born "Tue Mar 13 23:15:50 UTC 2018"
 
 ```
 
-## Final comments
 Notice that the last 3 Go containers were started without `--rm`, as was the nginx one. This means that the containers are not removed after stopping. Instead of having to issue another `docker run` command, a `docker start <container name>` command can be use.
 
 Try starting and stopping the Go containers. 
 
 To delete a continer issue `docker rm <container name>`
+
+# Kubernetes
+ Coming soon
 
 
 
