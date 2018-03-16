@@ -54,15 +54,12 @@ FROM golang:1.8
 
 EXPOSE 8080
 
-WORKDIR /go/src/app/
-COPY . .
-
 RUN go get -d -v github.com/JamesWalter/simple-go-service
 RUN go install -v github.com/JamesWalter/simple-go-service
 CMD [ "simple-go-service" ]
 ```
 
-Here is a breif explanation of each line in the `Dockerfile`
+Here is a brief explanation of each line in the `Dockerfile`
 + `FROM golang:1.8` This image is to be an extension of the Golang image version 1.8 on [Docker Hub](https://hub.docker.com/_/golang/)
 + `EXPOSE 8080` Lets Docker know that the container will listen on port 8080. The Go web app is configured to listen on port 8080.
 + `WORKDIR /go/src/app/` Set the present working directory within the container to /go/src/app'.
