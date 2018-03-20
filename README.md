@@ -28,7 +28,7 @@ I was born "Thu Mar  8 22:39:24 UTC 2018"
 
 # Build Docker Image
 
-To get the app up and running in a container we need to build a [Docker image](https://docs.docker.com/glossary/?term=image). 
+To get the app up and running in a container we need to build a [Docker image](https://docs.docker.com/glossary/?term=image). For now, ignore the Dockerfile that is included in this repository. We will build our own that pulls the go code from github. 
 
 Start by creating a new directory called `my-first-image`. Then create a new file named `Dockerfile` in the directory.
 
