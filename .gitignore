@@ -1,3 +1,2 @@
 #ignore build
-/simple-go-service
-*.exe
+/simple-go-service*
